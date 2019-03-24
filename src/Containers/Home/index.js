@@ -80,6 +80,10 @@ class HomePage extends Component {
     const { classes, listaCotacaoDia } = this.props;
     const routerHome = Routes.find(r => r.order === 1);
 
+    if (!listaCotacaoDia) {
+      return null;
+    }
+
     const GlobalQuote = listaCotacaoDia['Global Quote'];
     //     01. symbol: "MSFT"
     // 02. open: "119.5000"

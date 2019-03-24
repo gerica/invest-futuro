@@ -3,7 +3,58 @@ import BolsaAcoesActions, { BolsaAcoesTypes } from './actions';
 // import FbListaDoacaoService from '../../Service/FbListaDoacaoService';
 import { MSG_001 } from '../../Utils/constants';
 import { GLOBAL_QUOTE, KEY } from '../../Utils/alphavantage';
-import FbPapelService from '../../Service/FbPapelService';
+import FbUsuarioPapelService from '../../Service/FbUsuarioPapelService';
+import FbPapelService from '../../Service/FbCotacaoPapelService';
+
+function parceAlphavantageObj(payload) {
+  const quote = payload['Global Quote'];
+  const obj = {
+    symbol: quote['01. symbol'],
+    open: quote['02. open'],
+    high: quote['03. high'],
+    low: quote['04. low'],
+    price: quote['05. price'],
+    volume: quote['06. volume'],
+    latest_trading_day: quote['07. latest trading day'],
+    previous_close: quote['08. previous close'],
+    change: quote['09. change'],
+    change_percent: quote['10. change percent']
+  };
+  return obj;
+}
+
+function* fetchCotacaoPorPapel(papel) {
+  const url = `${GLOBAL_QUOTE}&symbol=${papel}&apikey=${KEY}`;
+  // const url =
+  //   'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=MSFT&apikey=demo';
+  // eslint-disable-next-line no-undef
+  const ReadableStream = yield call(fetch, url);
+  const response = yield ReadableStream.json();
+  return response;
+}
+
+function* fetchDadosPapel(papel) {
+  const dadosPapel = yield fetchCotacaoPorPapel(papel);
+  if (
+    !dadosPapel ||
+    !dadosPapel['Global Quote'] ||
+    !dadosPapel['Global Quote']['01. symbol']
+  ) {
+    throw new Error(`Não existe nenhum papel com o nome informado: ${papel}`);
+  }
+  return dadosPapel;
+}
+
+function* saveCotacaoPapel(payload) {
+  const obj = parceAlphavantageObj(payload);
+  const tradingDay = yield call(
+    [FbPapelService, FbPapelService.getByTradingDay],
+    obj
+  );
+  if (!tradingDay || tradingDay.length === 0) {
+    yield call([FbPapelService, FbPapelService.save], obj);
+  }
+}
 
 /**
  * Recuperar pet por usuário
@@ -11,12 +62,7 @@ import FbPapelService from '../../Service/FbPapelService';
  */
 function* fetchCotacaoRequest({ papel }) {
   try {
-    const url = `${GLOBAL_QUOTE}&symbol=${papel}&apikey=${KEY}`;
-    // const url =
-    //   'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=MSFT&apikey=demo';
-    // eslint-disable-next-line no-undef
-    const ReadableStream = yield call(fetch, url);
-    const response = yield ReadableStream.json();
+    const response = yield* fetchCotacaoPorPapel(papel);
 
     yield put(BolsaAcoesActions.fetchCotacaoSuccess(response));
   } catch (err) {
@@ -31,7 +77,7 @@ function* fetchCotacaoRequest({ papel }) {
 function* fetchPapeisPorUserRequest({ user }) {
   try {
     const values = yield call(
-      [FbPapelService, FbPapelService.getByIdUser],
+      [FbUsuarioPapelService, FbUsuarioPapelService.getByIdUser],
       user
     );
     yield put(BolsaAcoesActions.fetchPapeisPorUserSuccess(values));
@@ -52,8 +98,11 @@ function* savePapelRequest({ payload }) {
     } else {
       dados.papel = payload.papel.toUpperCase();
     }
-    yield call([FbPapelService, FbPapelService.save], dados);
 
+    const dadosPapel = yield* fetchDadosPapel(dados.papel);
+    yield* saveCotacaoPapel(dadosPapel);
+
+    yield call([FbUsuarioPapelService, FbUsuarioPapelService.save], dados);
     yield put(
       BolsaAcoesActions.fetchPapeisPorUserRequest({ uid: payload.user })
     );
@@ -68,7 +117,7 @@ function* savePapelRequest({ payload }) {
  */
 function* deletePapelRequest({ payload }) {
   try {
-    yield call([FbPapelService, FbPapelService.delete], payload);
+    yield call([FbUsuarioPapelService, FbUsuarioPapelService.delete], payload);
 
     yield put(
       BolsaAcoesActions.fetchPapeisPorUserRequest({ uid: payload.user })

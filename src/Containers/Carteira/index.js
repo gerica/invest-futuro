@@ -173,9 +173,9 @@ class CarteiraPage extends React.Component {
   }
 
   render() {
-    const { classes, user, error, handleSubmit, loading } = this.props;
+    const { classes, user, errorObj, handleSubmit, loading } = this.props;
     const { stateMessage, open, openDesc, rowSelected } = this.state;
-
+    // console.log({ errorObj });
     if (!user) {
       return <Redirect to={ROUTER_HOME} />;
     }
@@ -193,8 +193,8 @@ class CarteiraPage extends React.Component {
             onCleanMsg={this.onHandleChangeMessage}
           />
         ) : null}
-        {error ? (
-          <CustomizedSnackbars message={error.message} variant="error" />
+        {errorObj ? (
+          <CustomizedSnackbars message={errorObj.message} variant="error" />
         ) : null}
         <TitlePage routerMain={routerCarteira} routerList={listRouters} />
         <Fab
@@ -235,6 +235,7 @@ CarteiraPage.propTypes = {
   onDeletePapelRequest: PropTypes.func.isRequired,
   onResetRedux: PropTypes.func.isRequired,
   message: PropTypes.string,
+  errorObj: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   loading: PropTypes.bool
 };
 
@@ -244,6 +245,7 @@ CarteiraPage.defaultProps = {
 
 const mapStateToProps = createStructuredSelector({
   user: selectorsSession.selectorSessionUser(),
+  errorObj: selectorsBolsaAcoes.selectorError(),
   message: selectorsBolsaAcoes.selectorMessage(),
   loading: selectorsBolsaAcoes.selectorLoading(),
   listaPapeis: selectorsBolsaAcoes.selectorListaPapeis()

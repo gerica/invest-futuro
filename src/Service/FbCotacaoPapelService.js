@@ -1,8 +1,8 @@
 import firebase from '../Utils/FirebaseUtils';
 
-class FbPapelService {
+class FbCotacaoPapelService {
   constructor() {
-    this.ref = firebase.firestore().collection('usuarioPapel');
+    this.ref = firebase.firestore().collection('cotacaoPapel');
   }
 
   async save(payload) {
@@ -36,10 +36,11 @@ class FbPapelService {
     }
   }
 
-  async getByIdUser(user) {
+  async getByTradingDay(payload) {
     try {
       const fbUserPapel = await this.ref
-        .where('user', '==', user.id || user.uid)
+        .where('symbol', '==', payload.symbol)
+        .where('latest_trading_day', '==', payload.latest_trading_day)
         .get();
       const result = [];
       fbUserPapel.forEach(doc => {
@@ -75,4 +76,4 @@ class FbPapelService {
   }
 }
 
-export default new FbPapelService();
+export default new FbCotacaoPapelService();
