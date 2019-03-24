@@ -15,6 +15,7 @@ import {
 } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
 import AddIcon from '@material-ui/icons/Add';
+import moment from 'moment';
 
 import routes from '../../Utils/routes';
 import * as selectorsSession from '../../Stores/Session/selector';
@@ -140,11 +141,11 @@ class CarteiraPage extends React.Component {
           <TableHead>
             <TableRow>
               <CustomTableCell>Papel</CustomTableCell>
-              <CustomTableCell align="right">Custódia</CustomTableCell>
-              <CustomTableCell align="right">Preço médio</CustomTableCell>
-              <CustomTableCell align="right">Cotação</CustomTableCell>
-              <CustomTableCell align="right">Variação</CustomTableCell>
-              <CustomTableCell align="right">Posição Atual</CustomTableCell>
+              <CustomTableCell align="right">Quantidade</CustomTableCell>
+              <CustomTableCell align="right">Preço</CustomTableCell>
+              <CustomTableCell align="right">Data</CustomTableCell>
+              <CustomTableCell align="right">Despesa</CustomTableCell>
+              <CustomTableCell align="right">Observação</CustomTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -161,9 +162,13 @@ class CarteiraPage extends React.Component {
                   {row.quantidade}
                 </CustomTableCell>
                 <CustomTableCell align="right">{row.preco}</CustomTableCell>
-                <CustomTableCell align="right">0</CustomTableCell>
-                <CustomTableCell align="right">0</CustomTableCell>
-                <CustomTableCell align="right">0</CustomTableCell>
+                <CustomTableCell align="right">
+                  {moment(row.dtaOperacao).format('DD/MM/YYYY')}
+                </CustomTableCell>
+                <CustomTableCell align="right">{row.despesa}</CustomTableCell>
+                <CustomTableCell align="right">
+                  {row.observacao}
+                </CustomTableCell>
               </TableRow>
             ))}
           </TableBody>

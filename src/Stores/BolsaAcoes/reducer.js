@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   loading: false,
   error: null,
   message: null,
-  listaCotacaoDia: null,
+  listaPapeisCotacaoDia: null,
   listaPapeis: null
 };
 
@@ -31,10 +31,10 @@ export const resetRedux = (state = INITIAL_STATE) => ({
 });
 
 // FETCH
-export const fetchCotacaoSuccess = (
+export const fetchListaPapeisCotacaoDiaSuccess = (
   state = INITIAL_STATE,
-  { listaCotacaoDia }
-) => ({ ...state, loading: false, listaCotacaoDia, error: null });
+  { listaPapeisCotacaoDia }
+) => ({ ...state, loading: false, listaPapeisCotacaoDia, error: null });
 
 export const fetchPapeisPorUserSuccess = (
   state = INITIAL_STATE,
@@ -47,10 +47,6 @@ const localReducer = createReducer(INITIAL_STATE, {
   [BolsaAcoesTypes.SUCCESS]: success,
   [BolsaAcoesTypes.FAILURE]: failure,
 
-  // Fetch
-  [BolsaAcoesTypes.FETCH_COTACAO_REQUEST]: request,
-  [BolsaAcoesTypes.FETCH_COTACAO_SUCCESS]: fetchCotacaoSuccess,
-
   // Save
   [BolsaAcoesTypes.SAVE_PAPEL_REQUEST]: request,
 
@@ -59,7 +55,11 @@ const localReducer = createReducer(INITIAL_STATE, {
 
   // Fetch papeis por user
   [BolsaAcoesTypes.FETCH_PAPEIS_POR_USER_REQUEST]: request,
-  [BolsaAcoesTypes.FETCH_PAPEIS_POR_USER_SUCCESS]: fetchPapeisPorUserSuccess
+  [BolsaAcoesTypes.FETCH_PAPEIS_POR_USER_SUCCESS]: fetchPapeisPorUserSuccess,
+
+  // Fetch
+  [BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_REQUEST]: request,
+  [BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_SUCCESS]: fetchListaPapeisCotacaoDiaSuccess
 });
 
 export default localReducer;

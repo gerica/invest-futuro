@@ -6,7 +6,7 @@ import * as bolsaAcoesSaga from './BolsaAcoes/saga';
 // single entry point to start all Sagas at once
 export default function* rootSaga() {
   yield all([
-    bolsaAcoesSaga.watchFetchCotacaoRequest(),
+    bolsaAcoesSaga.watchFetchListaPapeisCotacaoDiaRequest(),
     bolsaAcoesSaga.watchSavePapelRequest(),
     bolsaAcoesSaga.watchfetchPapeisPorUserRequest(),
     bolsaAcoesSaga.watchDeletePapelRequest(),

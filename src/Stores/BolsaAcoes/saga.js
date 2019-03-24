@@ -60,11 +60,11 @@ function* saveCotacaoPapel(payload) {
  * Recuperar pet por usuário
  * @param {user} param0
  */
-function* fetchCotacaoRequest({ papel }) {
+function* fetchListaPapeisCotacaoDiaRequest({ payload }) {
   try {
-    const response = yield* fetchCotacaoPorPapel(papel);
-
-    yield put(BolsaAcoesActions.fetchCotacaoSuccess(response));
+    // const response = yield* fetchCotacaoPorPapel(papel);
+    console.log(payload);
+    yield put(BolsaAcoesActions.fetchListaPapeisCotacaoDiaSuccess());
   } catch (err) {
     yield put(BolsaAcoesActions.failure(err));
   }
@@ -128,8 +128,11 @@ function* deletePapelRequest({ payload }) {
   }
 }
 
-export function* watchFetchCotacaoRequest() {
-  yield takeLatest(BolsaAcoesTypes.FETCH_COTACAO_REQUEST, fetchCotacaoRequest);
+export function* watchFetchListaPapeisCotacaoDiaRequest() {
+  yield takeLatest(
+    BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_REQUEST,
+    fetchListaPapeisCotacaoDiaRequest
+  );
 }
 
 export function* watchSavePapelRequest() {
@@ -148,7 +151,7 @@ export function* watchfetchPapeisPorUserRequest() {
 }
 
 export default function* petSaga() {
-  yield all([watchFetchCotacaoRequest()]);
+  yield all([watchFetchListaPapeisCotacaoDiaRequest()]);
   yield all([watchSavePapelRequest()]);
   yield all([watchfetchPapeisPorUserRequest()]);
   yield all([watchDeletePapelRequest()]);

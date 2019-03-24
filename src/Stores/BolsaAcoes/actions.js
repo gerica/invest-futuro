@@ -6,8 +6,8 @@ const { Types, Creators } = createActions({
   success: ['message'],
   failure: ['error'],
 
-  fetchCotacaoRequest: ['papel'],
-  fetchCotacaoSuccess: ['listaCotacaoDia'],
+  fetchListaPapeisCotacaoDiaRequest: ['payload'],
+  fetchListaPapeisCotacaoDiaSuccess: ['listaPapeisCotacaoDia'],
 
   savePapelRequest: ['payload'],
 

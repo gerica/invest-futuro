@@ -1,9 +1,9 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { green, blue, red, amber } from '@material-ui/core/colors';
+import { green, teal, red, amber } from '@material-ui/core/colors';
 
 export default createMuiTheme({
   palette: {
-    primary: { main: blue[600] },
+    primary: { main: teal[600] },
     success: {
       backgroundColor: green[500],
       color: 'white'

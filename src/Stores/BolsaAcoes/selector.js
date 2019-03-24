@@ -3,10 +3,10 @@ import { createSelector } from 'reselect';
 const storeBolsaAcoes = state => state.bolsaAcoes;
 const storeForm = state => state.form;
 
-const selectorListaCotacaoDia = () =>
+const selectorListaPapeisCotacaoDia = () =>
   createSelector(
     storeBolsaAcoes,
-    store => store.listaCotacaoDia
+    store => store.listaPapeisCotacaoDia
   );
 const selectorLoading = () =>
   createSelector(
@@ -40,6 +40,6 @@ export {
   selectorLoading,
   selectorError,
   selectorMessage,
-  selectorListaCotacaoDia,
+  selectorListaPapeisCotacaoDia,
   selectorListaPapeis
 };
