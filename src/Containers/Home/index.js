@@ -1,3 +1,4 @@
+/* eslint-disable react/style-prop-object */
 /* eslint-disable prefer-destructuring */
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
@@ -18,6 +19,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
+import { FormattedNumber } from 'react-intl';
 // import moment from 'moment';
 
 import BolsaAcoesActions from '../../Stores/BolsaAcoes/actions';
@@ -181,12 +183,18 @@ class HomePage extends Component {
                 onClick={() => this.handleOpenDesc(row)}
               >
                 <CustomTableCell component="th" scope="row">
-                  {row.papel.toLocaleString('pt-BR')}
+                  {row.papel}
                 </CustomTableCell>
                 <CustomTableCell align="right">
                   {row.quantidade}
                 </CustomTableCell>
-                <CustomTableCell align="right">{row.preco}</CustomTableCell>
+                <CustomTableCell align="right">
+                  <FormattedNumber
+                    value={row.preco}
+                    style="currency"
+                    currency="BRL"
+                  />
+                </CustomTableCell>
                 {/* <CustomTableCell align="right">
                   {moment(row.dtaOperacao).format('DD/MM/YYYY')}
                 </CustomTableCell>
@@ -194,18 +202,28 @@ class HomePage extends Component {
                   {moment(row.cotacao.latest_trading_day).format('DD/MM/YYYY')}
                 </CustomTableCell> */}
                 <CustomTableCell align="right">
-                  {row.cotacao.previous_close}
+                  <FormattedNumber
+                    value={row.cotacao.previous_close}
+                    style="currency"
+                    currency="BRL"
+                  />
                 </CustomTableCell>
                 <CustomTableCell align="right">
-                  {row.cotacao.change} / {row.cotacao.change_percent}
+                  {row.cotacao.change} /{row.cotacao.change_percent}
                 </CustomTableCell>
                 <CustomTableCell align="right">
-                  {row.quantidade * row.preco}
+                  <FormattedNumber
+                    value={row.quantidade * row.preco}
+                    style="currency"
+                    currency="BRL"
+                  />
                 </CustomTableCell>
                 <CustomTableCell align="right">
-                  {(row.quantidade * row.cotacao.previous_close).toLocaleString(
-                    'pt-BR'
-                  )}
+                  <FormattedNumber
+                    value={row.quantidade * row.cotacao.previous_close}
+                    style="currency"
+                    currency="BRL"
+                  />
                 </CustomTableCell>
               </TableRow>
             ))}
