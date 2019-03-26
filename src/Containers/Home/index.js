@@ -20,7 +20,7 @@ import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
 import { FormattedNumber } from 'react-intl';
-// import moment from 'moment';
+import moment from 'moment';
 
 import BolsaAcoesActions from '../../Stores/BolsaAcoes/actions';
 import CustomizedProgress from '../../Components/Progress/CustomizedProgress';
@@ -62,6 +62,21 @@ const styles = theme => ({
   },
   avatar: {
     // backgroundColor: red[500]
+  },
+  paper: {
+    margin: theme.spacing.unit * 0.5,
+    overflowX: 'auto'
+  },
+  divDataUltimoPregao: {
+    display: 'flex',
+    justifyContent: 'flex-end'
+  },
+  paperDataUltimoPregao: {
+    marginLeft: 5,
+    width: '25%',
+    height: 50,
+    display: 'flex',
+    alignItems: 'center'
   }
 });
 
@@ -233,8 +248,26 @@ class HomePage extends Component {
     );
   }
 
+  renderDataUltimoPregao() {
+    const { classes } = this.props;
+    const { dtUltimoPregao } = this.state;
+    if (!dtUltimoPregao) {
+      return null;
+    }
+
+    return (
+      <div className={classes.divDataUltimoPregao}>
+        <Paper className={classes.paperDataUltimoPregao}>
+          Data do último pregão:
+          {moment(dtUltimoPregao.dtaOperacao).format('DD/MM/YYYY')}
+        </Paper>
+      </div>
+    );
+  }
+
   render() {
     const { loading, error } = this.props;
+
     const routerHome = Routes.find(r => r.order === 1);
 
     return (
@@ -244,6 +277,7 @@ class HomePage extends Component {
           <CustomizedSnackbars message={error.message} variant="error" />
         ) : null}
         {loading ? <CustomizedProgress /> : null}
+        {this.renderDataUltimoPregao()}
         {this.renderTablePapeis()}
         {/* <ViewCards>{this.renderCards()}</ViewCards> */}
       </Fragment>

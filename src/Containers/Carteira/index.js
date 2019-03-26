@@ -1,3 +1,4 @@
+/* eslint-disable react/style-prop-object */
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -16,6 +17,7 @@ import {
 import { Redirect } from 'react-router-dom';
 import AddIcon from '@material-ui/icons/Add';
 import moment from 'moment';
+import { FormattedNumber } from 'react-intl';
 
 import routes from '../../Utils/routes';
 import * as selectorsSession from '../../Stores/Session/selector';
@@ -160,14 +162,28 @@ class CarteiraPage extends React.Component {
                 onClick={() => this.handleOpenDesc(row)}
               >
                 <CustomTableCell component="th" scope="row">
+                  {row.papel}
+                </CustomTableCell>
+                <CustomTableCell align="right">
+                  <FormattedNumber
+                    value={row.preco}
+                    style="currency"
+                    currency="BRL"
+                  />
+                </CustomTableCell>
+                <CustomTableCell align="right">
                   {row.quantidade}
                 </CustomTableCell>
-                <CustomTableCell align="right">{row.papel}</CustomTableCell>
-                <CustomTableCell align="right">{row.preco}</CustomTableCell>
                 <CustomTableCell align="right">
                   {moment(row.dtaOperacao).format('DD/MM/YYYY')}
                 </CustomTableCell>
-                <CustomTableCell align="right">{row.despesa}</CustomTableCell>
+                <CustomTableCell align="right">
+                  <FormattedNumber
+                    value={row.despesa}
+                    style="currency"
+                    currency="BRL"
+                  />
+                </CustomTableCell>
                 <CustomTableCell align="right">
                   {row.observacao}
                 </CustomTableCell>

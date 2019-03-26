@@ -6,7 +6,8 @@ const INITIAL_STATE = {
   error: null,
   message: null,
   listaPapeisCotacaoDia: null,
-  listaPapeis: null
+  listaPapeis: null,
+  dtUltimoPregao: null
 };
 
 // Geral
@@ -34,7 +35,19 @@ export const resetRedux = (state = INITIAL_STATE) => ({
 export const fetchListaPapeisCotacaoDiaSuccess = (
   state = INITIAL_STATE,
   { listaPapeisCotacaoDia }
-) => ({ ...state, loading: false, listaPapeisCotacaoDia, error: null });
+) => {
+  let dtUltimoPregao;
+  if (listaPapeisCotacaoDia && listaPapeisCotacaoDia.length > 0) {
+    dtUltimoPregao = listaPapeisCotacaoDia[0].cotacao.latest_trading_day;
+  }
+  return {
+    ...state,
+    loading: false,
+    listaPapeisCotacaoDia,
+    dtUltimoPregao,
+    error: null
+  };
+};
 
 export const fetchPapeisPorUserSuccess = (
   state = INITIAL_STATE,
