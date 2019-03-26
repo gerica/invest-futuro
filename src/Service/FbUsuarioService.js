@@ -30,6 +30,7 @@ class FbUsuarioService {
 
   async getByIdUser(user) {
     try {
+      console.log({ user });
       const fbUser = await this.ref
         .where('id', '==', user.id || user.uid)
         .get();

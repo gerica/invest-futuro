@@ -1,4 +1,6 @@
 import { takeLatest, all, call, put } from 'redux-saga/effects';
+import moment from 'moment';
+
 import BolsaAcoesActions, { BolsaAcoesTypes } from './actions';
 // import FbListaDoacaoService from '../../Service/FbListaDoacaoService';
 import { MSG_001 } from '../../Utils/constants';
@@ -23,18 +25,13 @@ function parceAlphavantageObj(payload) {
   return obj;
 }
 
-function* fetchCotacaoPorPapel(papel) {
+function* fetchDadosPapel(papel) {
   const url = `${GLOBAL_QUOTE}&symbol=${papel}&apikey=${KEY}`;
   // const url =
   //   'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=MSFT&apikey=demo';
   // eslint-disable-next-line no-undef
   const ReadableStream = yield call(fetch, url);
-  const response = yield ReadableStream.json();
-  return response;
-}
-
-function* fetchDadosPapel(papel) {
-  const dadosPapel = yield fetchCotacaoPorPapel(papel);
+  const dadosPapel = yield ReadableStream.json();
   if (
     !dadosPapel ||
     !dadosPapel['Global Quote'] ||
@@ -45,14 +42,22 @@ function* fetchDadosPapel(papel) {
   return dadosPapel;
 }
 
-function* saveCotacaoPapel(payload) {
-  const obj = parceAlphavantageObj(payload);
-  const tradingDay = yield call(
-    [FbPapelService, FbPapelService.getByTradingDay],
-    obj
-  );
-  if (!tradingDay || tradingDay.length === 0) {
-    yield call([FbPapelService, FbPapelService.save], obj);
+function* gerenciarCotacaoPapel(payload) {
+  try {
+    const tradingDay = yield call(
+      [FbPapelService, FbPapelService.getByTradingDay],
+      payload
+    );
+    if (!tradingDay || tradingDay.length === 0) {
+      const objNaoFormatado = yield* fetchDadosPapel(payload.symbol);
+      const objPapel = parceAlphavantageObj(objNaoFormatado);
+      yield call([FbPapelService, FbPapelService.save], objPapel);
+      return objPapel;
+    }
+    return tradingDay;
+  } catch (err) {
+    console.log({ err });
+    throw new Error(err);
   }
 }
 
@@ -63,8 +68,25 @@ function* saveCotacaoPapel(payload) {
 function* fetchListaPapeisCotacaoDiaRequest({ payload }) {
   try {
     // const response = yield* fetchCotacaoPorPapel(papel);
-    console.log(payload);
-    yield put(BolsaAcoesActions.fetchListaPapeisCotacaoDiaSuccess());
+    // console.log(payload);
+    const values = yield call(
+      [FbUsuarioPapelService, FbUsuarioPapelService.getByIdUser],
+      payload
+    );
+    const result = [];
+    // eslint-disable-next-line no-plusplus
+    for (let index = 0; index < values.length; index++) {
+      const v = values[index];
+
+      const temp = yield* gerenciarCotacaoPapel({
+        symbol: v.papel,
+        latest_trading_day: moment(new Date()).format('YYYY-MM-DD')
+      });
+
+      result.push({ cotacao: { ...temp }, ...v });
+    }
+    console.log({ result });
+    yield put(BolsaAcoesActions.fetchListaPapeisCotacaoDiaSuccess(result));
   } catch (err) {
     yield put(BolsaAcoesActions.failure(err));
   }
@@ -99,8 +121,11 @@ function* savePapelRequest({ payload }) {
       dados.papel = payload.papel.toUpperCase();
     }
 
-    const dadosPapel = yield* fetchDadosPapel(dados.papel);
-    yield* saveCotacaoPapel(dadosPapel);
+    // const dadosPapel = yield* fetchDadosPapel(dados.papel);
+    yield* gerenciarCotacaoPapel({
+      symbol: dados.papel,
+      latest_trading_day: moment(payload.dataOperacao).format('YYYY-MM-DD')
+    });
 
     yield call([FbUsuarioPapelService, FbUsuarioPapelService.save], dados);
     yield put(

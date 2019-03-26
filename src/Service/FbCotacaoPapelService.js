@@ -42,9 +42,10 @@ class FbCotacaoPapelService {
         .where('symbol', '==', payload.symbol)
         .where('latest_trading_day', '==', payload.latest_trading_day)
         .get();
-      const result = [];
+
+      let result;
       fbUserPapel.forEach(doc => {
-        result.push({ idDoc: doc.id, ...doc.data() });
+        result = { idDoc: doc.id, ...doc.data() };
       });
       return result;
     } catch (error) {

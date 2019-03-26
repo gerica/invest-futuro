@@ -18,7 +18,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 // import red from '@material-ui/core/colors/red';
 import { withStyles } from '@material-ui/core/styles';
-import moment from 'moment';
+// import moment from 'moment';
 
 import BolsaAcoesActions from '../../Stores/BolsaAcoes/actions';
 import CustomizedProgress from '../../Components/Progress/CustomizedProgress';
@@ -76,8 +76,10 @@ const CustomTableCell = withStyles(theme => ({
 class HomePage extends Component {
   componentWillMount() {
     const { onFetchPapeisPorUserCotacaoRequest, reset, user } = this.props;
-    onFetchPapeisPorUserCotacaoRequest(user);
-    reset();
+    if (user) {
+      onFetchPapeisPorUserCotacaoRequest(user);
+      reset();
+    }
   }
 
   getRacaDescricao(raca) {
@@ -150,8 +152,8 @@ class HomePage extends Component {
   }
 
   renderTablePapeis() {
-    const { classes, listaPapeis } = this.props;
-    if (!listaPapeis || listaPapeis.length === 0) {
+    const { classes, listaPapeisCotacaoDia } = this.props;
+    if (!listaPapeisCotacaoDia || listaPapeisCotacaoDia.length === 0) {
       return null;
     }
 
@@ -161,33 +163,49 @@ class HomePage extends Component {
           <TableHead>
             <TableRow>
               <CustomTableCell>Papel</CustomTableCell>
-              <CustomTableCell align="right">Quantidade</CustomTableCell>
+              <CustomTableCell align="right">Custódia</CustomTableCell>
               <CustomTableCell align="right">Preço</CustomTableCell>
-              <CustomTableCell align="right">Data</CustomTableCell>
-              <CustomTableCell align="right">Despesa</CustomTableCell>
-              <CustomTableCell align="right">Observação</CustomTableCell>
+              {/* <CustomTableCell align="right">Data Compra</CustomTableCell>
+              <CustomTableCell align="right">Data Cotacao</CustomTableCell> */}
+              <CustomTableCell align="right">Valor Fechamento</CustomTableCell>
+              <CustomTableCell align="right">Variação</CustomTableCell>
+              <CustomTableCell align="right">Investimento</CustomTableCell>
+              <CustomTableCell align="right">Valor de Mercado</CustomTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {listaPapeis.map((row, index) => (
+            {listaPapeisCotacaoDia.map((row, index) => (
               <TableRow
                 className={classes.row}
                 key={index}
                 onClick={() => this.handleOpenDesc(row)}
               >
                 <CustomTableCell component="th" scope="row">
-                  {row.papel}
+                  {row.papel.toLocaleString('pt-BR')}
                 </CustomTableCell>
                 <CustomTableCell align="right">
                   {row.quantidade}
                 </CustomTableCell>
                 <CustomTableCell align="right">{row.preco}</CustomTableCell>
-                <CustomTableCell align="right">
+                {/* <CustomTableCell align="right">
                   {moment(row.dtaOperacao).format('DD/MM/YYYY')}
                 </CustomTableCell>
-                <CustomTableCell align="right">{row.despesa}</CustomTableCell>
                 <CustomTableCell align="right">
-                  {row.observacao}
+                  {moment(row.cotacao.latest_trading_day).format('DD/MM/YYYY')}
+                </CustomTableCell> */}
+                <CustomTableCell align="right">
+                  {row.cotacao.previous_close}
+                </CustomTableCell>
+                <CustomTableCell align="right">
+                  {row.cotacao.change} / {row.cotacao.change_percent}
+                </CustomTableCell>
+                <CustomTableCell align="right">
+                  {row.quantidade * row.preco}
+                </CustomTableCell>
+                <CustomTableCell align="right">
+                  {(row.quantidade * row.cotacao.previous_close).toLocaleString(
+                    'pt-BR'
+                  )}
                 </CustomTableCell>
               </TableRow>
             ))}
@@ -208,6 +226,7 @@ class HomePage extends Component {
           <CustomizedSnackbars message={error.message} variant="error" />
         ) : null}
         {loading ? <CustomizedProgress /> : null}
+        {this.renderTablePapeis()}
         {/* <ViewCards>{this.renderCards()}</ViewCards> */}
       </Fragment>
     );

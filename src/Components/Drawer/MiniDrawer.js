@@ -237,7 +237,7 @@ class MiniDrawer extends React.Component {
         </MenuItem>
       );
     } else {
-      const routeLogin = routes.find(e => e.order === 3);
+      const routeLogin = routes.find(e => e.order === 99);
       menus.push(
         <MenuItem
           key={3}

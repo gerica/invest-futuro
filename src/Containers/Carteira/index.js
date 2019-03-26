@@ -132,7 +132,11 @@ class CarteiraPage extends React.Component {
   renderTablePapeis() {
     const { classes, listaPapeis } = this.props;
     if (!listaPapeis || listaPapeis.length === 0) {
-      return null;
+      return (
+        <Paper className={classes.paper}>
+          <h1 style={{ marginLeft: 10 }}>Informe os seus papeis</h1>
+        </Paper>
+      );
     }
 
     return (
@@ -141,8 +145,8 @@ class CarteiraPage extends React.Component {
           <TableHead>
             <TableRow>
               <CustomTableCell>Papel</CustomTableCell>
-              <CustomTableCell align="right">Quantidade</CustomTableCell>
               <CustomTableCell align="right">Preço</CustomTableCell>
+              <CustomTableCell align="right">Quantidade</CustomTableCell>
               <CustomTableCell align="right">Data</CustomTableCell>
               <CustomTableCell align="right">Despesa</CustomTableCell>
               <CustomTableCell align="right">Observação</CustomTableCell>
@@ -156,11 +160,9 @@ class CarteiraPage extends React.Component {
                 onClick={() => this.handleOpenDesc(row)}
               >
                 <CustomTableCell component="th" scope="row">
-                  {row.papel}
-                </CustomTableCell>
-                <CustomTableCell align="right">
                   {row.quantidade}
                 </CustomTableCell>
+                <CustomTableCell align="right">{row.papel}</CustomTableCell>
                 <CustomTableCell align="right">{row.preco}</CustomTableCell>
                 <CustomTableCell align="right">
                   {moment(row.dtaOperacao).format('DD/MM/YYYY')}
