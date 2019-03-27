@@ -5,6 +5,7 @@ const INITIAL_STATE = {
   loading: false,
   error: null,
   message: null,
+  listaPapeisCotacaoDiaOrigin: null,
   listaPapeisCotacaoDia: null,
   listaPapeis: null,
   dtUltimoPregao: null
@@ -44,8 +45,51 @@ export const fetchListaPapeisCotacaoDiaSuccess = (
     ...state,
     loading: false,
     listaPapeisCotacaoDia,
+    listaPapeisCotacaoDiaOrigin: listaPapeisCotacaoDia,
     dtUltimoPregao,
     error: null
+  };
+};
+
+export const agruparPapeis = (state = INITIAL_STATE) => {
+  const { listaPapeisCotacaoDia } = state;
+  const result = [];
+
+  if (listaPapeisCotacaoDia && listaPapeisCotacaoDia.length > 0) {
+    listaPapeisCotacaoDia.forEach(e => {
+      const papel = result.find(r => r.papel === e.papel);
+      if (!papel) {
+        result.push({
+          ...e,
+          precos: [e.preco],
+          qtdTotal: parseInt(e.quantidade, 10)
+        });
+      } else {
+        papel.precos.push(e.preco);
+        papel.qtdTotal += parseInt(e.quantidade, 10);
+        // result.push({ ...e, precoMedio: e.preco, qtdTotal: e.quantidade });
+      }
+    });
+  }
+
+  if (result.length > 0) {
+    result.forEach(r => {
+      const sum = r.precos.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+      // eslint-disable-next-line no-param-reassign
+      r.precoMedio = sum / r.precos.length;
+    });
+  }
+  return {
+    ...state,
+    listaPapeisCotacaoDia: result
+  };
+};
+
+export const desagruparPapeis = (state = INITIAL_STATE) => {
+  const { listaPapeisCotacaoDiaOrigin } = state;
+  return {
+    ...state,
+    listaPapeisCotacaoDia: listaPapeisCotacaoDiaOrigin
   };
 };
 
@@ -72,7 +116,10 @@ const localReducer = createReducer(INITIAL_STATE, {
 
   // Fetch
   [BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_REQUEST]: request,
-  [BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_SUCCESS]: fetchListaPapeisCotacaoDiaSuccess
+  [BolsaAcoesTypes.FETCH_LISTA_PAPEIS_COTACAO_DIA_SUCCESS]: fetchListaPapeisCotacaoDiaSuccess,
+
+  [BolsaAcoesTypes.AGRUPAR_PAPEIS]: agruparPapeis,
+  [BolsaAcoesTypes.DESAGRUPAR_PAPEIS]: desagruparPapeis
 });
 
 export default localReducer;

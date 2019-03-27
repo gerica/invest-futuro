@@ -12,7 +12,9 @@ import {
   TableHead,
   TableRow,
   TableBody,
-  TableCell
+  TableCell,
+  Icon,
+  Tooltip
 } from '@material-ui/core';
 // import classnames from 'classnames';
 import { connect } from 'react-redux';
@@ -69,14 +71,21 @@ const styles = theme => ({
   },
   divDataUltimoPregao: {
     display: 'flex',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    alignItems: 'center'
   },
   paperDataUltimoPregao: {
-    marginLeft: 5,
+    margin: theme.spacing.unit * 0.5,
+    paddingLeft: 15,
     width: '25%',
     height: 50,
     display: 'flex',
     alignItems: 'center'
+  },
+  iconGroup: {
+    margin: theme.spacing.unit * 2,
+    fontSize: 50,
+    cursor: 'pointer'
   }
 });
 
@@ -91,6 +100,10 @@ const CustomTableCell = withStyles(theme => ({
 }))(TableCell);
 
 class HomePage extends Component {
+  state = {
+    showAllPapeis: false
+  };
+
   componentWillMount() {
     const { onFetchPapeisPorUserCotacaoRequest, reset, user } = this.props;
     if (user) {
@@ -116,6 +129,17 @@ class HomePage extends Component {
       const link = `https://api.whatsapp.com/send?phone=55${contato}&text=${text}`;
       window.open(link, '_blank');
     }
+  };
+
+  handleAgurpar = () => {
+    const { onAgruparPapeis, onDesagruparPapeis } = this.props;
+    const { showAllPapeis } = this.state;
+    if (showAllPapeis) {
+      onDesagruparPapeis();
+    } else {
+      onAgruparPapeis();
+    }
+    this.setState({ showAllPapeis: !showAllPapeis });
   };
 
   renderCards() {
@@ -170,6 +194,8 @@ class HomePage extends Component {
 
   renderTablePapeis() {
     const { classes, listaPapeisCotacaoDia } = this.props;
+    const { showAllPapeis } = this.state;
+
     if (!listaPapeisCotacaoDia || listaPapeisCotacaoDia.length === 0) {
       return null;
     }
@@ -181,7 +207,11 @@ class HomePage extends Component {
             <TableRow>
               <CustomTableCell>Papel</CustomTableCell>
               <CustomTableCell align="right">Custódia</CustomTableCell>
-              <CustomTableCell align="right">Preço</CustomTableCell>
+              {showAllPapeis ? (
+                <CustomTableCell align="right">Preço Médio</CustomTableCell>
+              ) : (
+                <CustomTableCell align="right">Preço</CustomTableCell>
+              )}
               {/* <CustomTableCell align="right">Data Compra</CustomTableCell>
               <CustomTableCell align="right">Data Cotacao</CustomTableCell> */}
               <CustomTableCell align="right">Valor Fechamento</CustomTableCell>
@@ -201,14 +231,22 @@ class HomePage extends Component {
                   {row.papel}
                 </CustomTableCell>
                 <CustomTableCell align="right">
-                  {row.quantidade}
+                  {showAllPapeis ? row.qtdTotal : row.quantidade}
                 </CustomTableCell>
                 <CustomTableCell align="right">
-                  <FormattedNumber
-                    value={row.preco}
-                    style="currency"
-                    currency="BRL"
-                  />
+                  {showAllPapeis ? (
+                    <FormattedNumber
+                      value={row.precoMedio}
+                      style="currency"
+                      currency="BRL"
+                    />
+                  ) : (
+                    <FormattedNumber
+                      value={row.preco}
+                      style="currency"
+                      currency="BRL"
+                    />
+                  )}
                 </CustomTableCell>
                 {/* <CustomTableCell align="right">
                   {moment(row.dtaOperacao).format('DD/MM/YYYY')}
@@ -249,17 +287,43 @@ class HomePage extends Component {
   }
 
   renderDataUltimoPregao() {
-    const { classes } = this.props;
-    const { dtUltimoPregao } = this.state;
+    const { classes, dtUltimoPregao } = this.props;
+    const { showAllPapeis } = this.state;
+
     if (!dtUltimoPregao) {
       return null;
     }
 
     return (
       <div className={classes.divDataUltimoPregao}>
+        {showAllPapeis ? (
+          <Tooltip title="Desagrupar Papeis" aria-label="Add">
+            <Icon
+              className={classes.iconGroup}
+              color="primary"
+              onClick={this.handleAgurpar}
+            >
+              toggle_off
+            </Icon>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Agrupar Papeis" aria-label="Add">
+            <Icon
+              className={classes.iconGroup}
+              color="primary"
+              onClick={this.handleAgurpar}
+            >
+              toggle_on
+            </Icon>
+          </Tooltip>
+        )}
         <Paper className={classes.paperDataUltimoPregao}>
-          Data do último pregão:
-          {moment(dtUltimoPregao.dtaOperacao).format('DD/MM/YYYY')}
+          <Typography component="p">
+            Data do último pregão:&nbsp;
+            <span style={{ fontWeight: 500 }}>
+              {moment(dtUltimoPregao.dtaOperacao).format('DD/MM/YYYY')}
+            </span>
+          </Typography>
         </Paper>
       </div>
     );
@@ -287,12 +351,15 @@ class HomePage extends Component {
 
 HomePage.propTypes = {
   onFetchPapeisPorUserCotacaoRequest: PropTypes.func,
+  onAgruparPapeis: PropTypes.func,
+  onDesagruparPapeis: PropTypes.func,
   loading: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   listaPapeisCotacaoDia: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.array
   ]),
-  error: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
+  error: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+  dtUltimoPregao: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 };
 
 HomePage.defaultProps = {
@@ -307,7 +374,8 @@ const mapStateToProps = createStructuredSelector({
   listaPapeisCotacaoDia: selectorsBolsaAcoes.selectorListaPapeisCotacaoDia(),
   loading: selectorsBolsaAcoes.selectorLoading(),
   error: selectorsBolsaAcoes.selectorError(),
-  user: selectorsSession.selectorSessionUser()
+  user: selectorsSession.selectorSessionUser(),
+  dtUltimoPregao: selectorsBolsaAcoes.selectorDtUltimoPregao()
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -315,7 +383,9 @@ const mapDispatchToProps = dispatch => ({
     dispatch(BolsaAcoesActions.fetchCotacaoRequest(papel)),
   onFetchPapeisPorUserCotacaoRequest: payload =>
     dispatch(BolsaAcoesActions.fetchListaPapeisCotacaoDiaRequest(payload)),
-  reset: () => dispatch(BolsaAcoesActions.resetRedux())
+  reset: () => dispatch(BolsaAcoesActions.resetRedux()),
+  onAgruparPapeis: () => dispatch(BolsaAcoesActions.agruparPapeis()),
+  onDesagruparPapeis: () => dispatch(BolsaAcoesActions.desagruparPapeis())
 });
 
 const HomePageRedux = connect(

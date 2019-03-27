@@ -14,7 +14,10 @@ const { Types, Creators } = createActions({
   deletePapelRequest: ['payload'],
 
   fetchPapeisPorUserRequest: ['user'],
-  fetchPapeisPorUserSuccess: ['listaPapeis']
+  fetchPapeisPorUserSuccess: ['listaPapeis'],
+
+  agruparPapeis: [],
+  desagruparPapeis: []
 });
 
 export const BolsaAcoesTypes = Types;

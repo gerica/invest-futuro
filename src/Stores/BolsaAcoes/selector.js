@@ -28,6 +28,11 @@ const selectorListaPapeis = () =>
     storeBolsaAcoes,
     store => store.listaPapeis
   );
+const selectorDtUltimoPregao = () =>
+  createSelector(
+    storeBolsaAcoes,
+    store => store.dtUltimoPregao
+  );
 
 const selectorForm = () =>
   createSelector(
@@ -41,5 +46,6 @@ export {
   selectorError,
   selectorMessage,
   selectorListaPapeisCotacaoDia,
-  selectorListaPapeis
+  selectorListaPapeis,
+  selectorDtUltimoPregao
 };

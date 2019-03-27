@@ -85,7 +85,6 @@ function* fetchListaPapeisCotacaoDiaRequest({ payload }) {
 
       result.push({ cotacao: { ...temp }, ...v });
     }
-    console.log({ result });
     yield put(BolsaAcoesActions.fetchListaPapeisCotacaoDiaSuccess(result));
   } catch (err) {
     yield put(BolsaAcoesActions.failure(err));
